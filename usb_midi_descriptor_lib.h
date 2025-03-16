@@ -57,7 +57,7 @@
 /**
  * @brief Initialize data structures for parsing a new MIDI descriptor
  */
-void usb_midi_descriptor_lib_init();
+void usb_midi_descriptor_lib_init(uint8_t idx);
 
 /**
  * @brief Parse the full configuration descriptor to discover the MIDI device's string indices
@@ -66,7 +66,7 @@ void usb_midi_descriptor_lib_init();
  * @return true if a MIDI descriptor was found in the full configuration descriptor
  * and the string indicies were successfully parsed
  */
-bool usb_midi_descriptor_lib_configure_from_full(uint8_t* full_config_descriptor);
+bool usb_midi_descriptor_lib_configure_from_full(uint8_t idx, const uint8_t* full_config_descriptor);
 
 /**
  * @brief Parse the MIDI Interface descriptor to disconver the MIDI device's string indices
@@ -75,7 +75,7 @@ bool usb_midi_descriptor_lib_configure_from_full(uint8_t* full_config_descriptor
  * @param max_len The number of bytes in the MIDI descriptor
  * @return true if the string indicies were successfully parsed
  */
-bool usb_midi_descriptor_lib_configure(uint8_t const *midi_descriptor, uint32_t max_len);
+bool usb_midi_descriptor_lib_configure(uint8_t idx, uint8_t const *midi_descriptor, uint32_t max_len);
 
 /**
  * @brief set indices to point to an array of all MIDI interface string indices
@@ -83,7 +83,7 @@ bool usb_midi_descriptor_lib_configure(uint8_t const *midi_descriptor, uint32_t 
  * @param inidices a pointer to an array of string indices
  * @return int the number of indices in the array
  */
-int usb_midi_descriptor_lib_get_all_str_inidices(const uint8_t** inidices);
+int usb_midi_descriptor_lib_get_all_str_inidices(uint8_t idx, const uint8_t** inidices);
 
 /**
  * @brief Get the string index for a particular MIDI IN virtual cable
@@ -91,7 +91,7 @@ int usb_midi_descriptor_lib_get_all_str_inidices(const uint8_t** inidices);
  * @param in_cable_num the cable number, 0-15
  * @return int the string index or 0 if none is found
  */
-int usb_midi_descriptor_lib_get_str_idx_for_in_cable(uint8_t in_cable_num);
+int usb_midi_descriptor_lib_get_str_idx_for_in_cable(uint8_t idx, uint8_t in_cable_num);
 
 /**
  * @brief Get the string index for a particular MIDI OUT virtual cable
@@ -99,4 +99,4 @@ int usb_midi_descriptor_lib_get_str_idx_for_in_cable(uint8_t in_cable_num);
  * @param out_cable_num the cable number, 0-15
  * @return int the string index or 0 if none is found
  */
-int usb_midi_descriptor_lib_get_str_idx_for_out_cable(uint8_t out_cable_num);
+int usb_midi_descriptor_lib_get_str_idx_for_out_cable(uint8_t idx, uint8_t out_cable_num);
