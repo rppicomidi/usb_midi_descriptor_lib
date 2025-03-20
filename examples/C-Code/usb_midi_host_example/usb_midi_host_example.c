@@ -37,6 +37,7 @@
 #include "bsp/board_api.h"
 #include "tusb.h"
 #include "usb_midi_descriptor_lib.h"
+#include "utf16_to_utf8.h"
 #ifdef RASPBERRYPI_PICO_W
 // The Board LED is controlled by the CYW43 WiFi/Bluetooth module
 #include "pico/cyw43_arch.h"
@@ -101,17 +102,13 @@ static void send_next_note(void)
         message[4] = first_note;
 }
 
-// Clearly a better UTF-16LE to UTF-8 translation
-// can be implemented. This is good enough for
-// most devices that support US English as the
-// primary lanugage ID.
 static void print_string_descriptor(uint16_t *buffer)
 {
-    uint8_t len = ((*buffer) & 0x7F)/2;
-    for (uint8_t idx = 1; idx < len; idx++) {
-        printf("%c", buffer[idx]);
-    }
-    printf("\r\n");
+    const size_t maxsrc = ((*buffer) & 0xFF)/2 - 1;
+    const size_t maxdest = maxsrc*2+1; // allows up to 2 bytes to encode each utf-16 code unit
+    uint8_t dest[maxdest];
+    utf16ToUtf8(buffer+1, maxsrc, dest, maxdest);
+    printf("%s\r\n", dest);
 }
 
 int main() {
@@ -149,10 +146,10 @@ int main() {
                 tuh_itf_info_t info;
                 uint16_t buffer[128];
                 if (tuh_midi_itf_get_info(midi_dev_idx[idx], &info)) {
-                    printf("For device %u at address %u:\r\n", idx, info.daddr);
                     if (tuh_descriptor_get_string_langid_sync(info.daddr, buffer, sizeof(buffer)) == XFER_RESULT_SUCCESS) {
                         display_dev_strings[idx] = false;
                         uint16_t langid = buffer[1];
+                        printf("For device %u at address %u:\r\n", idx, info.daddr);
                         if (tuh_descriptor_get_manufacturer_string_sync(info.daddr, langid, buffer, sizeof(buffer))== XFER_RESULT_SUCCESS) {
                             printf("manufacturer: ");
                             print_string_descriptor(buffer);
