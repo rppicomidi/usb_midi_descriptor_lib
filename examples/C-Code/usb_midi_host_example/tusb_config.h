@@ -49,13 +49,6 @@
 #define CFG_TUSB_OS                 OPT_OS_NONE
 #endif
 
-// TODO Do we need this?
-//#if CFG_TUSB_MCU == OPT_MCU_RP2040
-//#define PICO_RP2040_USB_FAST_IRQ 1
-//#endif
-// CFG_TUSB_DEBUG is defined by compiler in DEBUG build
-// #define CFG_TUSB_DEBUG           0
-
 /* USB DMA on some MCUs can only access a specific SRAM region with restriction on alignment.
  * Tinyusb use follows macros to declare transferring memory so that they can be put
  * into those specific section.
@@ -76,17 +69,19 @@
 //--------------------------------------------------------------------
 
 // Size of buffer to hold descriptors and other data used for enumeration
-#define CFG_TUH_ENUMERATION_BUFSIZE 256
+// It is defined to be large because MIDI devices such as effects pedals
+// or keyboard workstations that also have digital audio interfaces can
+// have long, complex USB descriptors.
+#define CFG_TUH_ENUMERATION_BUFSIZE 512
+#define CFG_TUH_HUB                 1 // Enable a single USB hub
 // max device support (excluding hub device)
-#define CFG_TUH_DEVICE_MAX          (CFG_TUH_HUB ? 4 : 1) // hub typically has 4 ports
+#define CFG_TUH_DEVICE_MAX          (3*CFG_TUH_HUB + 1) // hub typically has 4 ports
 
-#define CFG_TUH_HUB                 1 // Enable USB hubs
 #define CFG_TUH_CDC                 0
 #define CFG_TUH_HID                 0 // typical keyboard + mouse device can have 3-4 HID interfaces
 #define CFG_TUH_MIDI                (CFG_TUH_DEVICE_MAX)
-#define CFG_TUH_MSC                 1
+#define CFG_TUH_MSC                 0
 #define CFG_TUH_VENDOR              0
-
 
 #ifdef __cplusplus
  }
