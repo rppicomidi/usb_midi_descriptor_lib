@@ -49,9 +49,6 @@
 #define CFG_TUSB_OS                 OPT_OS_NONE
 #endif
 
-// CFG_TUSB_DEBUG is defined by compiler in DEBUG build
-// #define CFG_TUSB_DEBUG           0
-
 /* USB DMA on some MCUs can only access a specific SRAM region with restriction on alignment.
  * Tinyusb use follows macros to declare transferring memory so that they can be put
  * into those specific section.
@@ -70,33 +67,29 @@
 //--------------------------------------------------------------------
 // CONFIGURATION
 //--------------------------------------------------------------------
-// Enable host stack with pio-usb if Pico-PIO-USB library is available
-#define CFG_TUH_ENABLED     1
-#define CFG_TUH_RPI_PIO_USB 1
 
 // Size of buffer to hold descriptors and other data used for enumeration
-#define CFG_TUH_ENUMERATION_BUFSIZE 256
+// It is defined to be large because MIDI devices such as effects pedals
+// or keyboard workstations that also have digital audio interfaces can
+// have long, complex USB descriptors.
+#define CFG_TUH_ENUMERATION_BUFSIZE 512
+#define CFG_TUH_HUB                 1 // Enable a single USB hub
+// max device support (excluding hub device)
+#define CFG_TUH_DEVICE_MAX          (3*CFG_TUH_HUB + 1) // hub typically has 4 ports
 
-#define CFG_TUH_HUB                 1 // Enable USB hubs
 #define CFG_TUH_CDC                 0
 #define CFG_TUH_HID                 0 // typical keyboard + mouse device can have 3-4 HID interfaces
-//NOTE: Do note #define CFG_TUH_MIDI 1 to enable MIDI Host. A code fragment in usbh.c that breaks the build if you do that
-#define CFG_TUH_MSC                 1
+#define CFG_TUH_MIDI                (CFG_TUH_DEVICE_MAX)
+#define CFG_TUH_MSC                 0
 #define CFG_TUH_VENDOR              0
 
-// max device support (excluding hub device)
-#define CFG_TUH_DEVICE_MAX          (CFG_TUH_HUB ? 4 : 1) // hub typically has 4 ports
-
-// The PIO USB Host is on port 1
-#define BOARD_TUH_RHPORT            1
-// MIDI Host string support
-#define CFG_MIDI_HOST_DEVSTRINGS 1
-
-// This will work for the hardware described in the usb_midi_host project README.md
+// This will work for the hardware described in the project README.md
 // file and for the Adafruit RP2040 Feather with USB A Host board (see
 // https://learn.adafruit.com/adafruit-feather-rp2040-with-usb-type-a-host)
 #define USE_ADAFRUIT_FEATHER_RP2040_USBHOST 1
-
+#define BOARD_TUH_RHPORT                    1
+#define CFG_TUH_RPI_PIO_USB                 1
+#define PICO_DEFAULT_PIO_USB_DP_PIN         16
 #ifdef __cplusplus
  }
 #endif
